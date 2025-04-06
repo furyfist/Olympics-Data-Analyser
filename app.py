@@ -2,7 +2,11 @@ import streamlit as st
 import pandas as pd
 import Preprocessor,helper
 
-df = Preprocessor.preprocess()
+# Load datasets
+df = pd.read_csv('athlete_events.csv')
+region_df = pd.read_csv('noc_regions.csv')
+
+df = Preprocessor.preprocess(df,region_df)
 
 user_menu = st.sidebar.radio(
     'select an option',
