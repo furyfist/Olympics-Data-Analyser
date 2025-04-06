@@ -1,12 +1,16 @@
 import streamlit as st
 import pandas as pd
-import Preprocessor
+import Preprocessor,helper
 
 df = Preprocessor.preprocess()
 
-st.sidebar.radio(
+user_menu = st.sidebar.radio(
     'select an option',
     ('Medal Tally','Overall Analysis', 'Country-Wise Analysis', 'Athlete Wise Analysis')
 )
 
 st.dataframe(df)
+
+if user_menu == "Medal Tally":
+    medal_tally = helper.medal_tally(df)
+    st.dataframe(medal_tally)
