@@ -51,3 +51,39 @@ def fetch_medal_tally(df, year, country):
     x['Bronze'] = x['Bronze'].astype('int')
 
     return x
+
+def participating_nations_over_time(df):
+
+    nations_over_time = df.drop_duplicates(['Year','region'])['Year'].value_counts().reset_index().sort_values('Year')
+    nations_over_time.columns = ['Edition', 'No of Countries']
+    return nations_over_time
+
+def events_happening_over_time(df) :
+    events_over_time = df.drop_duplicates(['Year','Event'])['Year'].value_counts().reset_index().sort_values('Year')
+    events_over_time.columns = ['Edition','No. of Events']
+    return events_over_time
+
+def atheletes_over_time(df) :
+    over_time = df.drop_duplicates(['Year','Name'])['Year'].value_counts().reset_index().sort_values('Year')
+    over_time.columns = ['Edition','No. of Athletes']
+    return over_time
+
+def most_successful(df, country):
+    # Remove rows where Medal is NaN
+    temp_df = df.dropna(subset=['Medal'])
+
+    # Filter for the given country
+    temp_df = temp_df[temp_df['region'] == country]
+
+    # Get top 10 athletes by medal count
+    top_athletes = temp_df['Name'].value_counts().reset_index()
+    top_athletes.columns = ['Name', 'Medals']
+
+    # Merge with original df to get more info like Sport
+    merged = top_athletes.head(10).merge(df, on='Name', how='left')
+
+    # Drop duplicate athlete names
+    result = merged[['Name', 'Medals', 'Sport']].drop_duplicates(subset='Name')
+
+    return result
+

@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import Preprocessor
 import helper
+import plotly.express as px
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Load datasets
 df = pd.read_csv('athlete_events.csv')
@@ -38,3 +41,66 @@ if user_menu == "Medal Tally":
         st.title(f"Performance of {selected_country} in {selected_year}")
 
     st.table(medal_tally)
+
+if user_menu == "Overall Analysis":
+    st.sidebar.header("Overall Analysis")
+
+    editions = df['Year'].unique().shape[0]
+    cities = df['City'].unique().shape[0]
+    sports = df['Sport'].unique().shape[0]
+    events = df['Event'].unique().shape[0]
+    athletes = df['Name'].unique().shape[0]
+    nation = df['region'].unique().shape[0]
+
+    st.title("Top Statistics")
+    col1, col2, col3 = st.columns(3)
+    with col1: 
+        st.title("Editions")
+        st.header(editions)
+    with col2:
+        st.title("Hosts")
+        st.header(cities)
+    with col3:
+        st.title("Sports")
+        st.header(sports)
+
+    col1, col2, col3 = st.columns(3)
+    with col1: 
+        st.title("Events")
+        st.header(events)
+    with col2:
+        st.title("Athletes")
+        st.header(athletes)
+    with col3:
+        st.title("Nations")
+        st.header(nation)
+    
+st.title('# Participating Nations Over The Years')
+nations_over_time = helper.participating_nations_over_time(df)
+fig = px.line(nations_over_time, x="Edition", y="No of Countries")
+st.plotly_chart(fig)
+
+st.title('# Number of Events Over the Years')
+events_over_time = helper.events_happening_over_time(df)
+fig = px.line(events_over_time, x='Edition',y='No. of Events')
+st.plotly_chart(fig)
+
+st.title('# Number of Athletes Over the Years')
+over_time = helper.atheletes_over_time(df)
+fig = px.line(over_time, x='Edition',y='No. of Athletes')
+st.plotly_chart(fig)
+
+st.title("No. of Events over time(Every Sport)")
+fig, ax = plt.subplots(figsize=(20, 20))
+x = df.drop_duplicates(['Year', 'Sport', 'Event'])
+ax = sns.heatmap(x.pivot_table(index='Sport', columns='Year', values='Event', aggfunc='count').fillna(0).astype('int'), annot=True)
+st.pyplot(fig)
+
+st.title("Most successful Athletes")
+sport_list = df['Sport'].unique().tolist()
+sport_list.sort()
+sport_list.insert(0,'Overall')
+
+selected_sport = st.selectbox('Select a Sport',sport_list)
+x = helper.most_successful(df,selected_sport)
+st.table(x)
