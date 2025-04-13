@@ -54,7 +54,7 @@ if user_menu == "Overall Analysis":
 
     st.title("Top Statistics")
     col1, col2, col3 = st.columns(3)
-    with col1: 
+    with col1:
         st.title("Editions")
         st.header(editions)
     with col2:
@@ -65,7 +65,7 @@ if user_menu == "Overall Analysis":
         st.header(sports)
 
     col1, col2, col3 = st.columns(3)
-    with col1: 
+    with col1:
         st.title("Events")
         st.header(events)
     with col2:
@@ -74,7 +74,7 @@ if user_menu == "Overall Analysis":
     with col3:
         st.title("Nations")
         st.header(nation)
-    
+
 st.title('# Participating Nations Over The Years')
 nations_over_time = helper.participating_nations_over_time(df)
 fig = px.line(nations_over_time, x="Edition", y="No of Countries")
@@ -82,25 +82,25 @@ st.plotly_chart(fig)
 
 st.title('# Number of Events Over the Years')
 events_over_time = helper.events_happening_over_time(df)
-fig = px.line(events_over_time, x='Edition',y='No. of Events')
+fig = px.line(events_over_time, x='Edition', y='No. of Events')
 st.plotly_chart(fig)
 
 st.title('# Number of Athletes Over the Years')
 over_time = helper.atheletes_over_time(df)
-fig = px.line(over_time, x='Edition',y='No. of Athletes')
+fig = px.line(over_time, x='Edition', y='No. of Athletes')
 st.plotly_chart(fig)
 
 st.title("No. of Events over time(Every Sport)")
 fig, ax = plt.subplots(figsize=(20, 20))
 x = df.drop_duplicates(['Year', 'Sport', 'Event'])
-ax = sns.heatmap(x.pivot_table(index='Sport', columns='Year', values='Event', aggfunc='count').fillna(0).astype('int'), annot=True)
+ax = sns.heatmap(x.pivot_table(index='Sport', columns='Year',
+                 values='Event', aggfunc='count').fillna(0).astype('int'), annot=True)
 st.pyplot(fig)
 
 st.title("Most successful Athletes")
-sport_list = df['Sport'].unique().tolist()
-sport_list.sort()
-sport_list.insert(0,'Overall')
+sport_list = sorted(df['Sport'].drop_duplicates().tolist())
+sport_list.insert(0, 'Overall')
 
-selected_sport = st.selectbox('Select a Sport',sport_list)
-x = helper.most_successful(df,selected_sport)
+selected_sport = st.selectbox('Select a Sport', sport_list)
+x = helper.most_successful(df, selected_sport)
 st.table(x)
