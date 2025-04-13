@@ -1,4 +1,8 @@
 import numpy as np
+import streamlit as st
+import plotly.express as px
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def medal_tally(df):
@@ -101,6 +105,47 @@ def most_successful(df, sport):
     merged = top_athletes.head(10).merge(df, on='Name', how='left')
 
     # Drop duplicate athlete names
+    result = merged[['Name', 'Medals', 'Sport']].drop_duplicates(subset='Name')
+
+    return result
+
+
+def yearwise_medal_tally(df, country):
+    temp_df = df.dropna(subset=['Medal'])
+    temp_df.drop_duplicates(subset=[
+                            'Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'], inplace=True)
+
+    new_df = temp_df[temp_df['region'] == country]
+    final_df = new_df.groupby('Year').count()['Medal'].reset_index()
+
+    return final_df
+
+
+def country_event_heatmap(df, country):
+    temp_df = df.dropna(subset=['Medal'])
+    temp_df.drop_duplicates(subset=[
+                            'Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'], inplace=True)
+
+    new_df = temp_df[temp_df['region'] == country]
+
+    pt = new_df.pivot_table(index='Sport', columns='Year',
+                            values='Medal', aggfunc='count').fillna(0)
+    return pt
+
+
+def most_successful_countrywise(df, country):
+    # Filter rows with medals and for the selected country
+    temp_df = df.dropna(subset=['Medal'])
+    temp_df = temp_df[temp_df['region'] == country]
+
+    # Get the top 10 athletes by medal count
+    top_athletes = temp_df['Name'].value_counts().reset_index().head(10)
+    top_athletes.columns = ['Name', 'Medals']
+
+    # Merge with the original DataFrame to get additional details
+    merged = top_athletes.merge(df, on='Name', how='left')
+
+    # Drop duplicate athlete names and select relevant columns
     result = merged[['Name', 'Medals', 'Sport']].drop_duplicates(subset='Name')
 
     return result
